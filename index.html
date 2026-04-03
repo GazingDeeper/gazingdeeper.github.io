@@ -1,37 +1,430 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gazing Deeper</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: #0a0a1a;
-            color: #ffffff;
-            font-family: 'Georgia', serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            letter-spacing: 0.2em;
-            color: #c8a8e9;
-        }
-        p {
-            font-size: 1.1em;
-            color: #8888aa;
-            letter-spacing: 0.1em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gazing Deeper</title>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --near-black:#07071a;
+    --deep-navy:#0d0d2b;
+    --soft-lavender:#c8b8e8;
+    --warm-amber:#e8a94a;
+    --deep-purple:#3a1a6e;
+    --star-white:#f0eeff;
+    --muted-text:#8888aa;
+    --halo-gold:#f5c842;
+  }
+  html{scroll-behavior:smooth}
+  body{background:var(--near-black);color:var(--star-white);font-family:'Spectral',serif;overflow-x:hidden;cursor:default}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.5rem 3rem;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(7,7,26,0.95),transparent)}
+  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;letter-spacing:0.4em;color:var(--soft-lavender);text-decoration:none}
+  .nav-logo span{color:var(--warm-amber);font-weight:600}
+  .nav-links{display:flex;gap:2rem;list-style:none}
+  .nav-links a{color:var(--muted-text);text-decoration:none;font-size:0.78rem;letter-spacing:0.25em;text-transform:uppercase;font-family:'Spectral',serif;font-weight:300;transition:color 0.3s}
+  .nav-links a:hover{color:var(--soft-lavender)}
+
+  /* HERO */
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;text-align:center;padding:2rem}
+  #starCanvas{position:absolute;inset:0;width:100%;height:100%}
+  .hero-content{position:relative;z-index:2}
+  .hero-eyebrow{font-size:0.7rem;letter-spacing:0.5em;color:var(--warm-amber);text-transform:uppercase;margin-bottom:2rem;font-weight:300;opacity:0;animation:fadeUp 1.2s 0.5s forwards}
+  .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,10vw,8rem);font-weight:300;letter-spacing:0.15em;line-height:1;color:var(--star-white);opacity:0;animation:fadeUp 1.2s 0.8s forwards}
+  .hero-title span{color:var(--soft-lavender)}
+  .hero-gzdr{font-size:clamp(0.9rem,2vw,1.1rem);letter-spacing:0.6em;color:var(--warm-amber);font-weight:600;margin-top:1rem;opacity:0;animation:fadeUp 1.2s 1.1s forwards;font-family:'Spectral',serif}
+  .hero-tagline{font-size:clamp(0.9rem,2vw,1.1rem);color:var(--muted-text);letter-spacing:0.15em;margin-top:2rem;font-style:italic;font-weight:300;opacity:0;animation:fadeUp 1.2s 1.4s forwards;max-width:600px}
+  .hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeUp 1s 2.2s forwards}
+  .hero-scroll span{font-size:0.65rem;letter-spacing:0.4em;color:var(--muted-text);text-transform:uppercase}
+  .scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--soft-lavender),transparent);animation:scrollPulse 2s infinite}
+
+  /* EYE SECTION */
+  .eye-section{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:4rem 2rem}
+  #eyeCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:0.6}
+  .eye-content{position:relative;z-index:2;text-align:center;max-width:700px}
+  .section-label{font-size:0.65rem;letter-spacing:0.5em;color:var(--warm-amber);text-transform:uppercase;margin-bottom:1.5rem;font-weight:400}
+  .eye-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:300;line-height:1.4;color:var(--star-white);font-style:italic;margin-bottom:1.5rem}
+  .eye-sub{font-size:0.95rem;color:var(--muted-text);line-height:1.8;letter-spacing:0.05em;font-weight:300}
+
+  /* HALO DIVIDER */
+  .halo-divider{display:flex;align-items:center;justify-content:center;padding:3rem;gap:2rem}
+  .halo-line{flex:1;max-width:200px;height:1px;background:linear-gradient(to right,transparent,var(--deep-purple))}
+  .halo-line.right{background:linear-gradient(to left,transparent,var(--deep-purple))}
+  .halo-symbol{width:60px;height:60px;position:relative;display:flex;align-items:center;justify-content:center}
+  .halo-inner{width:20px;height:20px;border-radius:50%;background:var(--warm-amber);opacity:0.9}
+  .halo-ring{position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid rgba(245,200,66,0.35)}
+  .halo-ring2{position:absolute;width:60px;height:60px;border-radius:50%;border:1px solid rgba(245,200,66,0.15)}
+
+  /* SECTIONS */
+  section{padding:6rem 2rem;max-width:1200px;margin:0 auto}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;letter-spacing:0.1em;color:var(--star-white);margin-bottom:0.5rem}
+  .section-title span{color:var(--soft-lavender)}
+  .section-underline{width:60px;height:1px;background:var(--warm-amber);margin-bottom:3rem}
+
+  /* NEWS */
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+  .news-card{border:1px solid rgba(200,184,232,0.12);padding:2rem;background:rgba(13,13,43,0.6);backdrop-filter:blur(10px);transition:border-color 0.3s,transform 0.3s}
+  .news-card:hover{border-color:rgba(200,184,232,0.35);transform:translateY(-4px)}
+  .news-date{font-size:0.65rem;letter-spacing:0.3em;color:var(--warm-amber);text-transform:uppercase;margin-bottom:0.75rem}
+  .news-headline{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;color:var(--star-white);margin-bottom:0.5rem;line-height:1.4}
+  .news-body{font-size:0.85rem;color:var(--muted-text);line-height:1.7;font-weight:300}
+
+  /* MUSIC */
+  .music-section{background:rgba(13,13,43,0.4);border-top:1px solid rgba(200,184,232,0.08);border-bottom:1px solid rgba(200,184,232,0.08);padding:6rem 2rem}
+  .music-inner{max-width:1200px;margin:0 auto}
+  .streaming-links{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem}
+  .stream-btn{border:1px solid rgba(200,184,232,0.25);padding:0.75rem 2rem;color:var(--soft-lavender);text-decoration:none;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;font-family:'Spectral',serif;transition:all 0.3s;background:transparent}
+  .stream-btn:hover{background:rgba(200,184,232,0.1);border-color:var(--soft-lavender);color:var(--star-white)}
+  .stream-btn.amber{border-color:rgba(232,169,74,0.3);color:var(--warm-amber)}
+  .stream-btn.amber:hover{background:rgba(232,169,74,0.1);border-color:var(--warm-amber)}
+
+  /* TOUR */
+  .tour-list{list-style:none;margin-top:1rem}
+  .tour-item{display:grid;grid-template-columns:120px 1fr auto;gap:2rem;align-items:center;padding:1.5rem 0;border-bottom:1px solid rgba(200,184,232,0.08)}
+  .tour-item:first-child{border-top:1px solid rgba(200,184,232,0.08)}
+  .tour-date{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--warm-amber)}
+  .tour-venue{font-size:0.9rem;color:var(--star-white);font-weight:300}
+  .tour-city{font-size:0.75rem;color:var(--muted-text);letter-spacing:0.1em;margin-top:0.2rem}
+  .tour-btn{border:1px solid rgba(200,184,232,0.2);padding:0.5rem 1.25rem;color:var(--soft-lavender);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;text-decoration:none;font-family:'Spectral',serif;transition:all 0.3s}
+  .tour-btn:hover{background:rgba(200,184,232,0.1);border-color:var(--soft-lavender)}
+
+  /* VIDEO */
+  .video-placeholder{width:100%;aspect-ratio:16/9;background:rgba(13,13,43,0.8);border:1px solid rgba(200,184,232,0.12);display:flex;align-items:center;justify-content:center;margin-top:2rem;position:relative;overflow:hidden}
+  .play-btn{width:70px;height:70px;border-radius:50%;border:2px solid rgba(200,184,232,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s}
+  .play-btn:hover{border-color:var(--soft-lavender);background:rgba(200,184,232,0.1)}
+  .play-triangle{width:0;height:0;border-top:12px solid transparent;border-bottom:12px solid transparent;border-left:20px solid var(--soft-lavender);margin-left:4px}
+
+  /* GALLERY */
+  .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:2rem}
+  .gallery-item{aspect-ratio:1;background:rgba(58,26,110,0.3);border:1px solid rgba(200,184,232,0.08);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s}
+  .gallery-item:first-child{grid-column:span 2;aspect-ratio:2/1}
+  .gallery-item:hover{border-color:rgba(200,184,232,0.3)}
+  .gallery-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--muted-text);text-transform:uppercase}
+
+  /* SHOP */
+  .shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:2rem}
+  .shop-item{border:1px solid rgba(200,184,232,0.1);padding:2rem;text-align:center;transition:all 0.3s;background:rgba(7,7,26,0.5)}
+  .shop-item:hover{border-color:rgba(200,184,232,0.3);transform:translateY(-4px)}
+  .shop-img{width:100%;aspect-ratio:1;background:rgba(58,26,110,0.25);margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;position:relative}
+  .halo-tee{font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:var(--warm-amber);letter-spacing:0.3em}
+  .shop-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--star-white);margin-bottom:0.3rem}
+  .shop-price{font-size:0.8rem;color:var(--muted-text);margin-bottom:1rem}
+  .shop-btn{border:1px solid rgba(232,169,74,0.3);padding:0.5rem 1.5rem;color:var(--warm-amber);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;font-family:'Spectral',serif;background:transparent;cursor:pointer;transition:all 0.3s;width:100%}
+  .shop-btn:hover{background:rgba(232,169,74,0.1);border-color:var(--warm-amber)}
+
+  /* FOOTER */
+  footer{border-top:1px solid rgba(200,184,232,0.1);padding:4rem 2rem 2rem;text-align:center}
+  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;letter-spacing:0.3em;color:var(--soft-lavender);margin-bottom:0.5rem}
+  .footer-logo span{color:var(--warm-amber)}
+  .footer-tagline{font-size:0.75rem;color:var(--muted-text);letter-spacing:0.2em;margin-bottom:2rem;font-style:italic}
+  .footer-contact{font-size:0.8rem;color:var(--soft-lavender);letter-spacing:0.15em;margin-bottom:2rem}
+  .footer-contact a{color:var(--soft-lavender);text-decoration:none}
+  .footer-links{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem}
+  .footer-links a{font-size:0.65rem;letter-spacing:0.3em;color:var(--muted-text);text-decoration:none;text-transform:uppercase;transition:color 0.3s}
+  .footer-links a:hover{color:var(--soft-lavender)}
+  .footer-copy{font-size:0.65rem;color:rgba(136,136,170,0.4);letter-spacing:0.15em}
+  .skip-link{position:absolute;top:-40px;left:0;background:var(--soft-lavender);color:var(--near-black);padding:8px;z-index:200;transition:top 0.3s;font-size:0.8rem}
+  .skip-link:focus{top:0}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(0.8)}50%{opacity:1;transform:scaleY(1)}}
+
+  @media(max-width:768px){
+    nav{padding:1.2rem 1.5rem}
+    .nav-links{gap:1rem}
+    .nav-links a{font-size:0.65rem}
+    .tour-item{grid-template-columns:1fr;gap:0.5rem}
+    .gallery-grid{grid-template-columns:repeat(2,1fr)}
+    .gallery-item:first-child{grid-column:span 2}
+  }
+</style>
 </head>
 <body>
-    <div>
-        <h1>GAZING DEEPER</h1>
-        <p>In so many words...</p>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-logo" aria-label="Gazing Deeper - Home">GAZING DEEPER <span>GZDR</span></a>
+  <ul class="nav-links" role="list">
+    <li><a href="#news">News</a></li>
+    <li><a href="#music">Music</a></li>
+    <li><a href="#tour">Tour</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<main id="main-content">
+<section class="hero" aria-label="Hero section">
+  <canvas id="starCanvas" aria-hidden="true"></canvas>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Los Angeles, CA</p>
+    <h1 class="hero-title">GAZING<br><span>DEEPER</span></h1>
+    <p class="hero-gzdr">G Z D R</p>
+    <p class="hero-tagline">exploring the space between the stars and the self — outer worlds, inner light</p>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span>Explore</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- EYE / VISION SECTION -->
+<section class="eye-section" aria-labelledby="vision-heading">
+  <canvas id="eyeCanvas" aria-hidden="true"></canvas>
+  <div class="eye-content">
+    <p class="section-label">The Philosophy</p>
+    <h2 id="vision-heading" class="eye-quote">"Look up long enough and you begin to look within"</h2>
+    <p class="eye-sub">Gazing Deeper is about real life outer space experience — about life on earth, living as a human, personal growth, breaking through the walls we build for ourselves, and discovering joy. We want you to feel the space to look within.</p>
+  </div>
+</section>
+
+<div class="halo-divider" aria-hidden="true">
+  <div class="halo-line"></div>
+  <div class="halo-symbol">
+    <div class="halo-ring2"></div>
+    <div class="halo-ring"></div>
+    <div class="halo-inner"></div>
+  </div>
+  <div class="halo-line right"></div>
+</div>
+
+<!-- NEWS -->
+<section id="news" aria-labelledby="news-heading">
+  <p class="section-label">Latest</p>
+  <h2 id="news-heading" class="section-title">News <span>&amp; Updates</span></h2>
+  <div class="section-underline" role="presentation"></div>
+  <div class="news-grid">
+    <article class="news-card">
+      <p class="news-date">Coming Soon</p>
+      <h3 class="news-headline">Debut EP Announcement</h3>
+      <p class="news-body">The first collection of songs from Gazing Deeper is taking shape. More details coming soon from the deep.</p>
+    </article>
+    <article class="news-card">
+      <p class="news-date">Coming Soon</p>
+      <h3 class="news-headline">First Live Performance</h3>
+      <p class="news-body">Gazing Deeper prepares to bring the sonic experience live. Watch this space for dates and details.</p>
+    </article>
+    <article class="news-card">
+      <p class="news-date">Coming Soon</p>
+      <h3 class="news-headline">Music Video in Production</h3>
+      <p class="news-body">Visual stories from the cosmos are being crafted. Time-lapse skies, halos, and human moments.</p>
+    </article>
+  </div>
+</section>
+
+<!-- MUSIC -->
+<div class="music-section" id="music">
+  <div class="music-inner">
+    <p class="section-label">Listen</p>
+    <h2 class="section-title" id="music-heading">Music <span>&amp; Streaming</span></h2>
+    <div class="section-underline" role="presentation"></div>
+    <p style="color:var(--muted-text);font-size:0.9rem;font-style:italic;margin-bottom:1rem;font-weight:300">Music coming soon — follow us on your platform of choice</p>
+    <nav aria-label="Streaming platforms" class="streaming-links">
+      <a href="#" class="stream-btn" aria-label="Listen on Spotify">Spotify</a>
+      <a href="#" class="stream-btn" aria-label="Listen on Apple Music">Apple Music</a>
+      <a href="#" class="stream-btn" aria-label="Listen on YouTube Music">YouTube Music</a>
+      <a href="#" class="stream-btn amber" aria-label="Listen on Bandcamp">Bandcamp</a>
+      <a href="#" class="stream-btn amber" aria-label="Listen on SoundCloud">SoundCloud</a>
+    </nav>
+  </div>
+</div>
+
+<!-- TOUR -->
+<section id="tour" aria-labelledby="tour-heading">
+  <p class="section-label">Live</p>
+  <h2 id="tour-heading" class="section-title">Tour <span>Dates</span></h2>
+  <div class="section-underline" role="presentation"></div>
+  <ul class="tour-list" role="list" aria-label="Upcoming tour dates">
+    <li class="tour-item">
+      <div class="tour-date" aria-label="Date: TBA 2025">TBA 2025</div>
+      <div>
+        <div class="tour-venue">Venue TBA</div>
+        <div class="tour-city">Los Angeles, CA</div>
+      </div>
+      <a href="#contact" class="tour-btn" aria-label="Get notified about Los Angeles show">Notify Me</a>
+    </li>
+    <li class="tour-item">
+      <div class="tour-date" aria-label="Date: TBA 2025">TBA 2025</div>
+      <div>
+        <div class="tour-venue">Venue TBA</div>
+        <div class="tour-city">Los Angeles Area, CA</div>
+      </div>
+      <a href="#contact" class="tour-btn" aria-label="Get notified about upcoming show">Notify Me</a>
+    </li>
+  </ul>
+</section>
+
+<!-- VIDEOS -->
+<section id="videos" aria-labelledby="videos-heading" style="background:rgba(13,13,43,0.3);padding:6rem 2rem">
+  <div style="max-width:1200px;margin:0 auto">
+    <p class="section-label">Watch</p>
+    <h2 id="videos-heading" class="section-title">Videos</h2>
+    <div class="section-underline" role="presentation"></div>
+    <div class="video-placeholder" role="img" aria-label="Video player - coming soon">
+      <div style="text-align:center">
+        <div class="play-btn" aria-hidden="true"><div class="play-triangle"></div></div>
+        <p style="color:var(--muted-text);font-size:0.75rem;letter-spacing:0.2em;margin-top:1.5rem;text-transform:uppercase">Videos Coming Soon</p>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" aria-labelledby="gallery-heading">
+  <p class="section-label">Visuals</p>
+  <h2 id="gallery-heading" class="section-title">Gallery <span>&amp; Images</span></h2>
+  <div class="section-underline" role="presentation"></div>
+  <div class="gallery-grid" role="list" aria-label="Photo gallery">
+    <div class="gallery-item" role="listitem" aria-label="Sun halo photograph - coming soon" tabindex="0">
+      <p class="gallery-label">Sun Halo — Coming Soon</p>
+    </div>
+    <div class="gallery-item" role="listitem" aria-label="Night sky time-lapse - coming soon" tabindex="0">
+      <p class="gallery-label">Night Sky</p>
+    </div>
+    <div class="gallery-item" role="listitem" aria-label="Band photography - coming soon" tabindex="0">
+      <p class="gallery-label">The Band</p>
+    </div>
+    <div class="gallery-item" role="listitem" aria-label="Time-lapse series - coming soon" tabindex="0">
+      <p class="gallery-label">Time-Lapse</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section id="shop" style="background:rgba(13,13,43,0.3);padding:6rem 2rem" aria-labelledby="shop-heading">
+  <div style="max-width:1200px;margin:0 auto">
+    <p class="section-label">Merch</p>
+    <h2 id="shop-heading" class="section-title">Shop</h2>
+    <div class="section-underline" role="presentation"></div>
+    <div class="shop-grid">
+      <article class="shop-item">
+        <div class="shop-img" aria-label="Sun Halo T-Shirt product image placeholder">
+          <div style="text-align:center">
+            <div class="halo-symbol" style="margin:0 auto 0.75rem"><div class="halo-ring2"></div><div class="halo-ring"></div><div class="halo-inner"></div></div>
+            <p class="halo-tee">SUN HALO</p>
+          </div>
+        </div>
+        <h3 class="shop-name">Sun Halo Tee</h3>
+        <p class="shop-price">Coming Soon</p>
+        <button class="shop-btn" aria-label="Get notified when Sun Halo Tee is available">Notify Me</button>
+      </article>
+      <article class="shop-item">
+        <div class="shop-img" aria-label="GZDR Logo Tee product image placeholder">
+          <p style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--soft-lavender);letter-spacing:0.3em">GZDR</p>
+        </div>
+        <h3 class="shop-name">GZDR Logo Tee</h3>
+        <p class="shop-price">Coming Soon</p>
+        <button class="shop-btn" aria-label="Get notified when GZDR Logo Tee is available">Notify Me</button>
+      </article>
+      <article class="shop-item">
+        <div class="shop-img" aria-label="Gazing Deeper vinyl product image placeholder">
+          <div style="width:80px;height:80px;border-radius:50%;border:1px solid rgba(200,184,232,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto">
+            <div style="width:20px;height:20px;border-radius:50%;background:rgba(200,184,232,0.2);border:1px solid rgba(200,184,232,0.3)"></div>
+          </div>
+        </div>
+        <h3 class="shop-name">Debut EP — Vinyl</h3>
+        <p class="shop-price">Coming Soon</p>
+        <button class="shop-btn" aria-label="Get notified when Debut EP vinyl is available">Notify Me</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER / CONTACT -->
+<footer id="contact" role="contentinfo">
+  <div class="footer-logo">GAZING <span>DEEPER</span></div>
+  <p class="footer-tagline">exploring outer worlds, discovering inner light</p>
+  <address class="footer-contact" style="font-style:normal">
+    <a href="mailto:contact@gazingdeeper.com" aria-label="Email Gazing Deeper">contact@gazingdeeper.com</a>
+  </address>
+  <nav aria-label="Footer navigation" class="footer-links">
+    <a href="#news">News</a>
+    <a href="#music">Music</a>
+    <a href="#tour">Tour</a>
+    <a href="#videos">Videos</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#shop">Shop</a>
+  </nav>
+  <nav aria-label="Social media links" class="footer-links">
+    <a href="#" aria-label="Gazing Deeper on Instagram">Instagram</a>
+    <a href="#" aria-label="Gazing Deeper on Facebook">Facebook</a>
+    <a href="#" aria-label="Gazing Deeper on YouTube">YouTube</a>
+    <a href="#" aria-label="Gazing Deeper on Spotify">Spotify</a>
+  </nav>
+  <p class="footer-copy">&copy; 2025 Gazing Deeper &middot; GZDR Music &middot; Los Angeles, CA &middot; <a href="#" style="color:inherit;text-decoration:none">Accessibility</a></p>
+</footer>
+</main>
+
+<script>
+// STAR CANVAS
+const sc = document.getElementById('starCanvas');
+const sctx = sc.getContext('2d');
+let stars = [];
+function resizeStar(){sc.width=sc.offsetWidth;sc.height=sc.offsetHeight;initStars()}
+function initStars(){
+  stars=[];
+  const n=Math.floor((sc.width*sc.height)/3000);
+  for(let i=0;i<n;i++){
+    stars.push({x:Math.random()*sc.width,y:Math.random()*sc.height,r:Math.random()*1.5+0.2,speed:Math.random()*0.15+0.02,opacity:Math.random(),twinkle:Math.random()*0.02+0.005,color:Math.random()<0.15?'rgba(200,184,232,':'rgba(240,238,255,'})
+  }
+}
+function drawStars(){
+  sctx.clearRect(0,0,sc.width,sc.height);
+  const grad=sctx.createRadialGradient(sc.width/2,sc.height/2,0,sc.width/2,sc.height/2,sc.width*0.8);
+  grad.addColorStop(0,'rgba(13,13,43,0.95)');
+  grad.addColorStop(1,'rgba(7,7,26,1)');
+  sctx.fillStyle=grad;
+  sctx.fillRect(0,0,sc.width,sc.height);
+  stars.forEach(s=>{
+    s.opacity+=s.twinkle*(Math.random()>0.5?1:-1);
+    s.opacity=Math.max(0.1,Math.min(1,s.opacity));
+    s.y-=s.speed;
+    if(s.y<-2)s.y=sc.height+2;
+    sctx.beginPath();
+    sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sctx.fillStyle=s.color+s.opacity+')';
+    sctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize',resizeStar);
+resizeStar();
+drawStars();
+
+// EYE CANVAS - color nebula effect
+const ec=document.getElementById('eyeCanvas');
+const ectx=ec.getContext('2d');
+function resizeEye(){ec.width=ec.offsetWidth;ec.height=ec.offsetHeight}
+let t=0;
+function drawEye(){
+  ec.width=ec.offsetWidth;ec.height=ec.offsetHeight;
+  ectx.clearRect(0,0,ec.width,ec.height);
+  const cx=ec.width/2,cy=ec.height/2;
+  const colors=[
+    {r:58,g:26,b:110},{r:26,g:26,b:80},{r:100,g:60,b:180},{r:200,g:140,b:60}
+  ];
+  colors.forEach((c,i)=>{
+    const angle=t*0.0003+i*(Math.PI*2/colors.length);
+    const x=cx+Math.cos(angle)*ec.width*0.25;
+    const y=cy+Math.sin(angle)*ec.height*0.2;
+    const g=ectx.createRadialGradient(x,y,0,x,y,ec.width*0.4);
+    g.addColorStop(0,`rgba(${c.r},${c.g},${c.b},0.25)`);
+    g.addColorStop(1,'transparent');
+    ectx.fillStyle=g;
+    ectx.fillRect(0,0,ec.width,ec.height);
+  });
+  t++;
+  requestAnimationFrame(drawEye);
+}
+resizeEye();
+drawEye();
+</script>
 </body>
 </html>
